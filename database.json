@@ -1,0 +1,197 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "name": "Aditya",
+      "email": "adipra99@gmail.com"
+    },
+    {
+      "id": 2,
+      "name": "Alex",
+      "email": "alex@a.com"
+    },
+    {
+      "id": 3,
+      "name": "Vinoth",
+      "email": "v@g.com"
+    },
+    {
+      "id": 4,
+      "name": "Rishab",
+      "email": "rivnind@vnd.com"
+    },
+    {
+      "id": 5,
+      "name": "Sanjay",
+      "email": "dsvjdvsnsvnj@gjjg.com"
+    },
+    {
+      "id": 6,
+      "name": "Rahul",
+      "email": "fdfvvrew4@mfvi.com"
+    },
+    {
+      "id": 7,
+      "name": "Sid",
+      "email": "sd@hotmail.om"
+    },
+    {
+      "id": 8,
+      "name": "Abhishek",
+      "email": "csdcdsdc@bffk.com"
+    },
+    {
+      "id": 9,
+      "name": "Shrinivas",
+      "email": "sadussia@vjvdjdv.com"
+    },
+    {
+      "id": 10,
+      "name": "Justin",
+      "email": "qwertty@google..com"
+    },
+    {
+      "id": 11,
+      "name": "Arvind",
+      "email": "dfjnfbdn123@gmail.com"
+    },
+    {
+      "id": 12,
+      "name": "Steve",
+      "email": "ewjejkwew@fgdfdgn.com"
+    },
+    {
+      "id": 13,
+      "name": "Swaraj",
+      "email": "qjdj@mvbmi.com"
+    },
+    {
+      "id": 14,
+      "name": "Shruti",
+      "email": "vdsdv@tg.com"
+    },
+    {
+      "id": 15,
+      "name": "Shreya",
+      "email": "dsfmds@bfbj.com"
+    },
+    {
+      "name": "Ajit",
+      "email": "aj@g.com",
+      "id": 16
+    },
+    {
+      "name": "Raj",
+      "email": "r@g.com",
+      "id": 17
+    },
+    {
+      "name": "Bob",
+      "email": "bob@yahoo.com",
+      "id": 18
+    }
+  ],
+  "devices": [
+    {
+      "id": 1,
+      "type": "LG Monitor",
+      "description": "27 inch 4k",
+      "employeeIdLinked": 2
+    },
+    {
+      "id": 2,
+      "type": "Sony MX4",
+      "description": "Noise cancelling",
+      "employeeIdLinked": 1
+    },
+    {
+      "id": 3,
+      "type": "Logitech Keyboard",
+      "description": "Rgb lights",
+      "employeeIdLinked": 4
+    },
+    {
+      "id": 4,
+      "type": "Razer Mouse",
+      "description": "Different dpi control"
+    },
+    {
+      "id": 5,
+      "type": "Apple Trackpad",
+      "description": "Very smooth",
+      "employeeIdLinked": 2
+    },
+    {
+      "id": 6,
+      "type": "Harddrive",
+      "description": "2 Tb"
+    },
+    {
+      "id": 7,
+      "type": "Raspberry Pi",
+      "description": "Pi4 ModelB",
+      "employeeIdLinked": 2
+    },
+    {
+      "id": 8,
+      "type": "Iphone",
+      "description": "13 Pro"
+    },
+    {
+      "id": 9,
+      "type": "Macbook",
+      "description": "16 inch 2019",
+      "employeeIdLinked": 2
+    },
+    {
+      "id": 10,
+      "type": "Macbook",
+      "description": "M1"
+    },
+    {
+      "id": 11,
+      "type": "Macbook",
+      "description": "Air M2"
+    },
+    {
+      "id": 12,
+      "type": "Macbook",
+      "description": "16 inch 2019"
+    },
+    {
+      "id": 13,
+      "type": "ThinkPad",
+      "description": "X1 carbon 2021"
+    },
+    {
+      "id": 14,
+      "type": "ThinkPad",
+      "description": "X1 Carbon 2021"
+    },
+    {
+      "id": 15,
+      "type": "Samsung Curved Monitor",
+      "description": "32 inch 8k"
+    },
+    {
+      "id": 16,
+      "type": "HDMI cable",
+      "description": "HDMI 2.0"
+    },
+    {
+      "id": 17,
+      "type": "Dock",
+      "description": "Lenova 7-1 dock"
+    },
+    {
+      "id": 18,
+      "type": "Router",
+      "description": "5Ghz"
+    },
+    {
+      "type": "Printer",
+      "description": "Hp Inkjet",
+      "id": 19
+    }
+  ]
+}
