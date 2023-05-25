@@ -13,7 +13,7 @@
     {
       "id": 3,
       "name": "Vinoth",
-      "email": "vin@g.com"
+      "email": "viny@g.com"
     },
     {
       "id": 4,
@@ -23,7 +23,8 @@
     {
       "id": 5,
       "name": "Sanjay",
-      "email": "dsvjdvsnsvnj@gjjg.com"
+      "email": "sanjay@yahoo.com",
+      "emaail": "sanjay@yahoo.com"
     },
     {
       "id": 6,
@@ -107,13 +108,14 @@
     {
       "id": 3,
       "type": "Logitech Keyboard",
-      "description": "Rgb lights",
+      "description": "Rgb lights Neon",
       "employeeIdLinked": 4
     },
     {
       "id": 4,
       "type": "Razer Mouse",
-      "description": "Different dpi control"
+      "description": "Different dpi control",
+      "employeeIdLinked": 5
     },
     {
       "id": 5,
@@ -172,7 +174,8 @@
     {
       "id": 15,
       "type": "Samsung Curved Monitor",
-      "description": "32 inch 8k"
+      "description": "32 inch 8k",
+      "employeeIdLinked": 6
     },
     {
       "id": 16,

@@ -7,6 +7,11 @@ import { tap } from 'rxjs';
 import { DeviceTableActions } from 'src/app/components/data-table/device/device-table/state/device-table.action';
 import { DeviceTableState } from 'src/app/components/data-table/device/device-table/state/device-table.feature';
 import { InventoryService } from 'src/app/services/inventory.service';
+import {
+  DeviceItemsFeature,
+  DeviceItemsState,
+} from './state/device-items.feature';
+import { DeviceItemsActions } from './state/device-items.action';
 
 @Component({
   selector: 'app-device-items',
@@ -92,18 +97,24 @@ export class DeviceItemsComponent implements OnInit {
     private inventoryService: InventoryService,
     private fb: FormBuilder,
     private _snackBar: MatSnackBar,
-    private store: Store<DeviceTableState>
-  ) {}
-  ngOnInit(): void {
+    private storeTable: Store<DeviceTableState>,
+    private storeItems: Store<DeviceItemsState>
+  ) {
     this.id = this.route.snapshot.paramMap.get('id');
+  }
+  ngOnInit(): void {
     console.log('id->', this.id);
-    this.obs$ = this.inventoryService.getDeviceDetails(this.id).pipe(
-      tap((res) => {
-        this.deviceData = res;
-        console.log(this.deviceData);
-        this.buildForm();
-      })
-    );
+    this.storeItems.dispatch(DeviceItemsActions.loadForm({ id: this.id }));
+    this.obs$ = this.storeItems
+      .select(DeviceItemsFeature.selectFormData)
+      .pipe(tap((res) => (this.deviceData = res)));
+    // this.obs$ = this.inventoryService.getDeviceDetails(this.id).pipe(
+    //   tap((res) => {
+    //     this.deviceData = res;
+    //     console.log(this.deviceData);
+    //     this.buildForm();
+    //   })
+    // );
     this.buildForm();
   }
   private buildForm() {
@@ -120,13 +131,27 @@ export class DeviceItemsComponent implements OnInit {
     this.formData.value.employeeIdLinked = parseInt(
       this.formData.value.employeeIdLinked
     );
-    console.log('Submitting form: ', this.formData.value);
-    this.inventoryService
-      .patchDeviceDetails(this.id, this.formData.value)
-      .subscribe((res: any) => {});
+    let tempData = this.formData.value;
+    let tempValue = {
+      description: tempData.description
+        ? tempData.description
+        : this.deviceData.description,
+      type: tempData.type ? tempData.type : this.deviceData.type,
+      id: this.id,
+      employeeIdLinked: tempData.employeeIdLinked
+        ? tempData.employeeIdLinked
+        : this.deviceData.employeeIdLinked,
+    };
+    console.log('Submitting form: ', tempValue);
+    this.storeItems.dispatch(
+      DeviceItemsActions.submitForm({ deviceId: this.id, formData: tempValue })
+    );
+    // this.inventoryService
+    //   .patchDeviceDetails(this.id, tempValue)
+    //   .subscribe((res: any) => {});
     this._snackBar.open('Device Detail Successfully Edited', '', {
       duration: 1500,
     });
-    this.store.dispatch(DeviceTableActions.toggleLoad());
+    this.storeTable.dispatch(DeviceTableActions.toggleLoad());
   }
 }

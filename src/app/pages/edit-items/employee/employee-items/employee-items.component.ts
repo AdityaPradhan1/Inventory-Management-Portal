@@ -7,11 +7,16 @@ import { concatMap, map, tap, withLatestFrom } from 'rxjs';
 import { EmployeeTableActions } from 'src/app/components/data-table/employee/employee-table/state/employee-table.action';
 import { EmployeeTableState } from 'src/app/components/data-table/employee/employee-table/state/employee-table.feature';
 import { InventoryService } from 'src/app/services/inventory.service';
+import {
+  EmployeeItemsFeature,
+  EmployeeItemsState,
+} from './state/employee-items.feature';
+import { EmployeeItemsActions } from './state/employee-items.action';
 
 @Component({
   selector: 'app-employee-items',
   template: `
-    <div class="item-container" [hidden]="(obs$ | async) ? false : true">
+    <div class="item-container" *ngIf="obs$ | async">
       <h1 class="title-text">Edit Employees Details</h1>
       <form class="example-form" [formGroup]="formData" (ngSubmit)="onSubmit()">
         <div>
@@ -46,7 +51,7 @@ import { InventoryService } from 'src/app/services/inventory.service';
             <mat-label>Device Ids (Seperate with commas)</mat-label>
             <input
               matInput
-              [value]="numberOfDevices > 0 ? employeeData?.deviceIds : '-'"
+              [value]="employeeData?.deviceIds ? employeeData?.deviceIds : '-'"
               formControlName="deviceIds"
             />
           </mat-form-field>
@@ -93,29 +98,41 @@ export class EmployeeItemsComponent implements OnInit {
     private inventoryService: InventoryService,
     private fb: FormBuilder,
     private _snackBar: MatSnackBar,
-    private store: Store<EmployeeTableState>
-  ) {}
-  ngOnInit(): void {
+    private storeTable: Store<EmployeeTableState>,
+    private storeItems: Store<EmployeeItemsState>
+  ) {
     this.id = this.route.snapshot.paramMap.get('id');
+  }
+  ngOnInit(): void {
     console.log('id->', this.id);
-    this.obs$ = this.inventoryService.getEmployeeDetails(this.id).pipe(
-      withLatestFrom(this.inventoryService.getDevices()),
-      tap((res: any) => {
-        console.log('ressss', res);
-        let data1 = res[0];
-        let data2 = res[1];
-        let result: any;
+    // this.storeItems.dispatch(EmployeeItemsActions.setId(this.id));
+    this.storeItems.dispatch(EmployeeItemsActions.loadForm({ id: this.id }));
+    this.obs$ = this.storeItems
+      .select(EmployeeItemsFeature.selectFormData)
+      .pipe(
+        tap((res) => {
+          this.employeeData = res;
+          console.log('res', res);
+        })
+      );
+    // this.obs$ = this.inventoryService.getEmployeeDetails(this.id).pipe(
+    //   withLatestFrom(this.inventoryService.getDevices()),
+    //   tap((res: any) => {
+    //     console.log('ressss', res);
+    //     let data1 = res[0];
+    //     let data2 = res[1];
+    //     let result: any;
 
-        result = data2
-          .filter((ele: any) => ele.employeeIdLinked === data1.id)
-          .map((obj: any) => obj.id);
-        this.numberOfDevices = result.length;
-        data1 = { ...data1, deviceIds: result.toString() };
-        this.employeeData = data1;
-        console.log(this.employeeData);
-        this.buildForm();
-      })
-    );
+    //     result = data2
+    //       .filter((ele: any) => ele.employeeIdLinked === data1.id)
+    //       .map((obj: any) => obj.id);
+    //     this.numberOfDevices = result.length;
+    //     data1 = { ...data1, deviceIds: result.toString() };
+    //     this.employeeData = data1;
+    //     console.log(this.employeeData);
+    //     // this.buildForm();
+    //   })
+    // );
     this.buildForm();
   }
   private buildForm() {
@@ -127,33 +144,50 @@ export class EmployeeItemsComponent implements OnInit {
   }
   onSubmit() {
     let tempData: any = { ...this.formData.value };
+    let tempName = tempData.name ? tempData.name : this.employeeData.name;
+    let tempEmail = tempData.email ? tempData.email : this.employeeData.email;
+    let tempId = tempData.deviceIds
+      ? tempData.deviceIds
+      : this.employeeData.deviceIds;
+    let tempValue = { name: tempName, email: tempEmail };
     delete this.formData.value.deviceIds;
-    console.log('Submitting form: ', this.formData.value);
-    this.inventoryService
-      .patchEmployeeDetails(this.id, this.formData.value)
-      .subscribe();
+    console.log('Submitting form: ', tempValue);
+    this.storeItems.dispatch(
+      EmployeeItemsActions.submitForm({
+        employeeId: this.id,
+        formData: tempValue,
+      })
+    );
+    // this.inventoryService.patchEmployeeDetails(this.id, tempValue).subscribe();
 
     //changing devices tables
     console.log('tempData', tempData);
 
-    let devicesArray = tempData.deviceIds.split(',');
+    let devicesArray = tempId.split(',');
     devicesArray.forEach((deviceId: any) => {
-      this.inventoryService
-        .getDeviceDetails(deviceId)
-        .pipe(
-          map((res: any) => ({
-            ...res,
-            employeeIdLinked: parseInt(this.id),
-          })),
-          concatMap((res) =>
-            this.inventoryService.patchDeviceDetails(deviceId, res)
-          )
-        )
-        .subscribe((res: any) => {});
+      this.storeItems.dispatch(
+        EmployeeItemsActions.submitDeviceChangeForm({
+          employeeId: this.id,
+          deviceId: deviceId,
+        })
+      );
+
+      // this.inventoryService
+      //   .getDeviceDetails(deviceId)
+      //   .pipe(
+      //     map((res: any) => ({
+      //       ...res,
+      //       employeeIdLinked: parseInt(this.id),
+      //     })),
+      //     concatMap((res) =>
+      //       this.inventoryService.patchDeviceDetails(deviceId, res)
+      //     )
+      //   )
+      //   .subscribe((res: any) => {});
     });
     this._snackBar.open('Employeee Detail Successfully Edited', '', {
       duration: 1500,
     });
-    this.store.dispatch(EmployeeTableActions.toggleLoad());
+    this.storeTable.dispatch(EmployeeTableActions.toggleLoad());
   }
 }

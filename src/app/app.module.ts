@@ -39,6 +39,10 @@ import { EmployeeTableFeature } from './components/data-table/employee/employee-
 import { EmployeeTableEffects } from './components/data-table/employee/employee-table/state/employee-table.effects';
 import { DeviceTableFeature } from './components/data-table/device/device-table/state/device-table.feature';
 import { DeviceTableEffects } from './components/data-table/device/device-table/state/device-table.effects';
+import { EmployeeItemsFeature } from './pages/edit-items/employee/employee-items/state/employee-items.feature';
+import { EmployeeItemsEffects } from './pages/edit-items/employee/employee-items/state/employee-items.effects';
+import { DeviceItemsFeature } from './pages/edit-items/device/device-items/state/device-items.feature';
+import { DeviceItemsEffects } from './pages/edit-items/device/device-items/state/device-items.effects';
 @NgModule({
   declarations: [
     AppComponent,
@@ -77,9 +81,16 @@ import { DeviceTableEffects } from './components/data-table/device/device-table/
     MatDialogModule,
     StoreModule.forFeature(EmployeeTableFeature),
     StoreModule.forFeature(DeviceTableFeature),
+    StoreModule.forFeature(EmployeeItemsFeature),
+    StoreModule.forFeature(DeviceItemsFeature),
     StoreModule.forRoot({}, {}),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
-    EffectsModule.forRoot([EmployeeTableEffects, DeviceTableEffects]),
+    EffectsModule.forRoot([
+      EmployeeTableEffects,
+      DeviceTableEffects,
+      EmployeeItemsEffects,
+      DeviceItemsEffects,
+    ]),
   ],
   providers: [
     {
