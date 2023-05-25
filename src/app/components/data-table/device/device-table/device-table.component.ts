@@ -3,13 +3,19 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
-import { InventoryService } from 'src/app/services/inventory.service';
+import { Store } from '@ngrx/store';
+import {
+  DeviceTableState,
+  selectDataSource,
+  selectIsLoaded,
+} from './state/device-table.feature';
+
+import { DeviceTableActions } from './state/device-table.action';
 
 @Component({
   selector: 'app-device-table',
   template: `
-    <div [hidden]="(deviceData$ | async) ? false : true" class="device-data">
+    <div class="device-data">
       <mat-form-field>
         <mat-label>Filter</mat-label>
         <input
@@ -109,6 +115,7 @@ import { InventoryService } from 'src/app/services/inventory.service';
 export class DeviceTableComponent implements OnInit {
   deviceData$: any;
   dataSource: any;
+  loaded: boolean = false;
   displayedColumns: string[] = [
     'deviceId',
     'type',
@@ -119,20 +126,32 @@ export class DeviceTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(
-    private inventoryService: InventoryService,
-    private router: Router
-  ) {}
+  constructor(private router: Router, private store: Store<DeviceTableState>) {}
   ngOnInit(): void {
-    this.deviceData$ = this.inventoryService.getDevices().pipe(
-      tap((res: any) => {
-        console.log(res);
+    this.store.select(selectDataSource).subscribe((res) => {
+      res.paginator = this.paginator;
+      res.sort = this.sort;
+      this.dataSource = res;
+      console.log('RRR', res);
+    });
+    this.store.select(selectIsLoaded).subscribe((res) => {
+      this.loaded = res;
+    });
+    if (!this.loaded) {
+      //caching can put dispatch in it, breaking pagination
+    }
+    this.store.dispatch(DeviceTableActions.loadTable());
 
-        this.dataSource = new MatTableDataSource(res);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      })
-    );
+    // this.deviceData$ = this.inventoryService.getDevices().pipe(
+    //   tap((res: any) => {
+    //     console.log(res);
+    //     console.log('pag1\n', this.paginator, 'sort1\n', this.sort);
+
+    //     this.dataSource = new MatTableDataSource(res);
+    //     this.dataSource.paginator = this.paginator;
+    //     this.dataSource.sort = this.sort;
+    //   })
+    // );
   }
 
   applyFilter(event: Event) {

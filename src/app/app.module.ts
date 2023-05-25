@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -32,6 +32,13 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DeviceItemsComponent } from './pages/edit-items/device/device-items/device-items.component';
 import { EmployeeItemsComponent } from './pages/edit-items/employee/employee-items/employee-items.component';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { EffectsModule } from '@ngrx/effects';
+import { EmployeeTableFeature } from './components/data-table/employee/employee-table/state/employee-table.feature';
+import { EmployeeTableEffects } from './components/data-table/employee/employee-table/state/employee-table.effects';
+import { DeviceTableFeature } from './components/data-table/device/device-table/state/device-table.feature';
+import { DeviceTableEffects } from './components/data-table/device/device-table/state/device-table.effects';
 @NgModule({
   declarations: [
     AppComponent,
@@ -68,6 +75,11 @@ import { EmployeeItemsComponent } from './pages/edit-items/employee/employee-ite
     MatStepperModule,
     MatSnackBarModule,
     MatDialogModule,
+    StoreModule.forFeature(EmployeeTableFeature),
+    StoreModule.forFeature(DeviceTableFeature),
+    StoreModule.forRoot({}, {}),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
+    EffectsModule.forRoot([EmployeeTableEffects, DeviceTableEffects]),
   ],
   providers: [
     {

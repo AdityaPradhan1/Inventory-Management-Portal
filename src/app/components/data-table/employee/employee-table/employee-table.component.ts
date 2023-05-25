@@ -3,21 +3,25 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { tap, withLatestFrom } from 'rxjs';
-import { InventoryService } from 'src/app/services/inventory.service';
+import {
+  EmployeeTableState,
+  selectDataSource,
+  selectIsLoaded,
+  selectTableData,
+} from './state/employee-table.feature';
+import { EmployeeTableActions } from './state/employee-table.action';
 
 @Component({
   selector: 'app-employee-table',
   template: `
-    <div
-      [hidden]="(employeeData$ | async) ? false : true"
-      class="employee-data"
-    >
+    <div class="employee-data">
       <mat-form-field>
         <mat-label>Filter</mat-label>
         <input
           matInput
-          (keyup)="applyFilter($event)"
+          (keyup)="applyFilter($event, dataSource)"
           placeholder="Ex. Aditya"
           #input
         />
@@ -111,7 +115,8 @@ import { InventoryService } from 'src/app/services/inventory.service';
 })
 export class EmployeeTableComponent implements OnInit {
   employeeData$: any;
-  dataSource: any;
+  loaded: boolean = false;
+  dataSource: any = undefined;
   displayedColumns: string[] = [
     'employeeId',
     'name',
@@ -119,43 +124,60 @@ export class EmployeeTableComponent implements OnInit {
     'devicesOwned',
     'edit',
   ];
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator | any;
+  @ViewChild(MatSort) sort!: MatSort | any;
 
   constructor(
-    private inventoryService: InventoryService,
-    private router: Router
+    private router: Router,
+    private store: Store<EmployeeTableState>
   ) {}
   ngOnInit(): void {
-    this.employeeData$ = this.inventoryService
-      .getEmployees()
-      //async doesnt work issue-> material ui https://github.com/angular/components/issues/10205
-      //fixed tempory instead of ngif used hidden
-      .pipe(
-        withLatestFrom(this.inventoryService.getDevices()),
-        tap((res: any) => {
-          console.log('ressss', res);
-          let data1 = res[0];
-          let data2 = res[1];
-          let result: any;
-          let newData1: any = [];
-          data1.forEach((element: any) => {
-            result = data2
-              .filter((ele: any) => ele.employeeIdLinked === element.id)
-              .map((obj: any) => obj.type)
-              .toString();
-            element = { ...element, devicesOwned: result };
-            newData1.push(element);
-          });
-          console.log('newsRes', newData1);
+    //async doesnt work issue-> material ui https://github.com/angular/components/issues/10205
+    //fixed tempory instead of ngif used hidden
+    this.employeeData$ = this.store.select(selectTableData);
+    this.store.select(selectDataSource).subscribe((res) => {
+      res.paginator = this.paginator;
+      res.sort = this.sort;
+      this.dataSource = res;
+    });
+    this.store.select(selectIsLoaded).subscribe((res) => {
+      this.loaded = res;
+    });
+    if (this.loaded === false) {
+      //caching can put dispatch in it, breaking pagination
+    }
+    this.store.dispatch(EmployeeTableActions.loadTable());
+    this.store.dispatch(
+      EmployeeTableActions.initialisePaginator(this.paginator)
+    );
+    this.store.dispatch(EmployeeTableActions.initialiseSort(this.sort));
+    // this.employeeData$ = this.inventoryService
+    //   .getEmployees()
 
-          this.dataSource = new MatTableDataSource(newData1);
-          this.dataSource.paginator = this.paginator;
-          console.log('p1', this.paginator);
-
-          this.dataSource.sort = this.sort;
-        })
-      );
+    //   .pipe(
+    //     withLatestFrom(this.inventoryService.getDevices()),
+    //     tap((res: any) => {
+    //       console.log('ressss', res);
+    //       let data1 = res[0];
+    //       let data2 = res[1];
+    //       let result: any;
+    //       let newData1: any = [];
+    //       data1.forEach((element: any) => {
+    //         result = data2
+    //           .filter((ele: any) => ele.employeeIdLinked === element.id)
+    //           .map((obj: any) => obj.type)
+    //           .toString();
+    //         element = { ...element, devicesOwned: result };
+    //         newData1.push(element);
+    //       });
+    //       console.log('newsRes', newData1);
+    //       this.dataSource = new MatTableDataSource(newData1);
+    //       console.log('datasource', this.dataSource);
+    //       this.dataSource.paginator = this.paginator;
+    //       console.log('p1', this.paginator);
+    //       this.dataSource.sort = this.sort;
+    //     })
+    //   );
     // .subscribe((res: any) => {
     //   this.dataSource = new MatTableDataSource(res);
     //   this.dataSource.paginator = this.paginator;
@@ -163,16 +185,35 @@ export class EmployeeTableComponent implements OnInit {
     // });
   }
 
-  applyFilter(event: Event) {
+  applyFilter(event: Event, data: any) {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    console.log('event', event);
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
+    data.filter = filterValue.trim().toLowerCase();
+    if (data.paginator) {
+      data.paginator.firstPage();
     }
   }
   onEdit(data: any) {
     console.log('data->', data);
     this.router.navigate(['../items/employee', data.id]);
   }
+  // getDS(data: any) {
+  //   console.log();
+
+  //   // console.log('pag2\n', this.paginator, '\nsort2\n', this.sort);
+  //   // let newData2 = data;
+  //   // if (data.length > 0) {
+  //   //   let newData = { ...data };
+
+  //   //   newData2 = new MatTableDataSource(newData);
+  //   //   newData2.paginator = this.paginator;
+  //   //   newData2.sort = this.sort;
+  //   //   // data.paginator = this.paginator;
+  //   //   // data.sort = this.sort;
+  //   //   console.warn('data\n', data, '\nnewdata\n', newData2);
+  //   // }
+  //   // return data.length > 0 ? newData2 : data;
+  //   return data;
+  // }
 }

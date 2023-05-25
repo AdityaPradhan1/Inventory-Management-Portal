@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,9 @@ export class InventoryService {
     return this.http.get(this.url + 'employees/' + id);
   }
   getDevices() {
-    return this.http.get(this.url + 'devices');
+    return this.http
+      .get(this.url + 'devices')
+      .pipe(shareReplay({ refCount: false }));
   }
   getDeviceDetails(id: any) {
     return this.http.get(this.url + 'devices/' + id);

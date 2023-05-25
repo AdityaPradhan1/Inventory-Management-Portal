@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { concatMap, map, tap, withLatestFrom } from 'rxjs';
+import { EmployeeTableActions } from 'src/app/components/data-table/employee/employee-table/state/employee-table.action';
+import { EmployeeTableState } from 'src/app/components/data-table/employee/employee-table/state/employee-table.feature';
 import { InventoryService } from 'src/app/services/inventory.service';
 
 @Component({
@@ -13,7 +16,7 @@ import { InventoryService } from 'src/app/services/inventory.service';
       <form class="example-form" [formGroup]="formData" (ngSubmit)="onSubmit()">
         <div>
           <mat-form-field class="example-full-width">
-            <mat-label>Device Id</mat-label>
+            <mat-label>Employee Id</mat-label>
             <input matInput disabled [value]="id" />
           </mat-form-field>
         </div>
@@ -55,15 +58,14 @@ import { InventoryService } from 'src/app/services/inventory.service';
   styles: [
     `
       .item-container {
-        margin-top: 5em;
-        margin-left: 33em;
+        padding: 5em 33em;
       }
       .title-text {
-        padding-left: 12em;
-        margin-bottom: 2em;
+        padding-: 2em 12em;
+        font-size: 2em;
       }
       .example-form {
-        min-width: 15em;
+        min-width: 20em;
         max-width: 60em;
         width: 100%;
       }
@@ -90,7 +92,8 @@ export class EmployeeItemsComponent implements OnInit {
     private route: ActivatedRoute,
     private inventoryService: InventoryService,
     private fb: FormBuilder,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private store: Store<EmployeeTableState>
   ) {}
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
@@ -146,11 +149,11 @@ export class EmployeeItemsComponent implements OnInit {
             this.inventoryService.patchDeviceDetails(deviceId, res)
           )
         )
-        .subscribe((res: any) => {
-          this._snackBar.open('Employeee Detail Successfully Edited', '', {
-            duration: 1500,
-          });
-        });
+        .subscribe((res: any) => {});
     });
+    this._snackBar.open('Employeee Detail Successfully Edited', '', {
+      duration: 1500,
+    });
+    this.store.dispatch(EmployeeTableActions.toggleLoad());
   }
 }

@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { tap } from 'rxjs';
+import { DeviceTableActions } from 'src/app/components/data-table/device/device-table/state/device-table.action';
+import { DeviceTableState } from 'src/app/components/data-table/device/device-table/state/device-table.feature';
 import { InventoryService } from 'src/app/services/inventory.service';
 
 @Component({
@@ -55,12 +58,11 @@ import { InventoryService } from 'src/app/services/inventory.service';
   styles: [
     `
       .item-container {
-        margin-top: 5em;
-        margin-left: 33em;
+        padding: 5em 33em;
       }
       .title-text {
-        padding-left: 15em;
-        margin-bottom: 2em;
+        padding-: 2em 12em;
+        font-size: 2em;
       }
       .example-form {
         min-width: 15em;
@@ -89,7 +91,8 @@ export class DeviceItemsComponent implements OnInit {
     private route: ActivatedRoute,
     private inventoryService: InventoryService,
     private fb: FormBuilder,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private store: Store<DeviceTableState>
   ) {}
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
@@ -120,10 +123,10 @@ export class DeviceItemsComponent implements OnInit {
     console.log('Submitting form: ', this.formData.value);
     this.inventoryService
       .patchDeviceDetails(this.id, this.formData.value)
-      .subscribe((res: any) => {
-        this._snackBar.open('Device Detail Successfully Edited', '', {
-          duration: 1500,
-        });
-      });
+      .subscribe((res: any) => {});
+    this._snackBar.open('Device Detail Successfully Edited', '', {
+      duration: 1500,
+    });
+    this.store.dispatch(DeviceTableActions.toggleLoad());
   }
 }

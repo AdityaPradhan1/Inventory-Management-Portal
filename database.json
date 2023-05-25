@@ -13,7 +13,7 @@
     {
       "id": 3,
       "name": "Vinoth",
-      "email": "v@g.com"
+      "email": "vin@g.com"
     },
     {
       "id": 4,
@@ -146,7 +146,8 @@
     {
       "id": 10,
       "type": "Macbook",
-      "description": "M1"
+      "description": "M1",
+      "employeeIdLinked": 3
     },
     {
       "id": 11,

@@ -6,7 +6,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Store } from '@ngrx/store';
 import { Observable, combineLatest, concat, concatMap, map, tap } from 'rxjs';
+import { DeviceTableActions } from 'src/app/components/data-table/device/device-table/state/device-table.action';
+import { DeviceTableState } from 'src/app/components/data-table/device/device-table/state/device-table.feature';
+import { EmployeeTableActions } from 'src/app/components/data-table/employee/employee-table/state/employee-table.action';
+import { EmployeeTableState } from 'src/app/components/data-table/employee/employee-table/state/employee-table.feature';
 import { InventoryService } from 'src/app/services/inventory.service';
 
 @Component({
@@ -38,10 +43,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
             #stepper
             [animationDuration]="stepperAnimationValue"
           >
-            <!-- <mat-step [stepControl]="firstFormGroup">
+            <!-- <mat-step [stepControl]="firstFormGroupA">
               <form
-                [formGroup]="firstFormGroup"
-                (ngSubmit)="form1()"
+                [formGroup]="firstFormGroupA"
+                (ngSubmit)="form1A()"
                 #formone="ngForm"
               >
                 <ng-template matStepLabel>Enter Employee Id</ng-template>
@@ -59,10 +64,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
                 </div>
               </form>
             </mat-step> -->
-            <mat-step [stepControl]="secondFormGroup">
+            <mat-step [stepControl]="secondFormGroupA">
               <form
-                [formGroup]="secondFormGroup"
-                (ngSubmit)="form2()"
+                [formGroup]="secondFormGroupA"
+                (ngSubmit)="form2A()"
                 #formtwo="ngForm"
               >
                 <ng-template matStepLabel>Enter Employee Name</ng-template>
@@ -80,10 +85,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
                 </div>
               </form>
             </mat-step>
-            <mat-step [stepControl]="thirdFormGroup">
+            <mat-step [stepControl]="thirdFormGroupA">
               <form
-                [formGroup]="thirdFormGroup"
-                (ngSubmit)="form3()"
+                [formGroup]="thirdFormGroupA"
+                (ngSubmit)="form3A()"
                 #formthree="ngForm"
               >
                 <ng-template matStepLabel>Enter Employee Email</ng-template>
@@ -131,10 +136,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
             #stepper
             [animationDuration]="stepperAnimationValue"
           >
-            <!-- <mat-step [stepControl]="firstFormGroup">
+            <!-- <mat-step [stepControl]="firstFormGroupB">
               <form
-                [formGroup]="firstFormGroup"
-                (ngSubmit)="form1()"
+                [formGroup]="firstFormGroupB"
+                (ngSubmit)="form1B()"
                 #formone="ngForm"
               >
                 <ng-template matStepLabel>Enter Device Id</ng-template>
@@ -152,10 +157,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
                 </div>
               </form>
             </mat-step> -->
-            <mat-step [stepControl]="secondFormGroup">
+            <mat-step [stepControl]="secondFormGroupB">
               <form
-                [formGroup]="secondFormGroup"
-                (ngSubmit)="form2()"
+                [formGroup]="secondFormGroupB"
+                (ngSubmit)="form2B()"
                 #formtwo="ngForm"
               >
                 <ng-template matStepLabel>Enter Device Type</ng-template>
@@ -173,10 +178,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
                 </div>
               </form>
             </mat-step>
-            <mat-step [stepControl]="thirdFormGroup">
+            <mat-step [stepControl]="thirdFormGroupB">
               <form
-                [formGroup]="thirdFormGroup"
-                (ngSubmit)="form3()"
+                [formGroup]="thirdFormGroupB"
+                (ngSubmit)="form3B()"
                 #formthree="ngForm"
               >
                 <ng-template matStepLabel>Enter Device Description</ng-template>
@@ -223,10 +228,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
             #stepper
             [animationDuration]="stepperAnimationValue"
           >
-            <mat-step [stepControl]="firstFormGroup">
+            <mat-step [stepControl]="firstFormGroupC">
               <form
-                [formGroup]="firstFormGroup"
-                (ngSubmit)="form1()"
+                [formGroup]="firstFormGroupC"
+                (ngSubmit)="form1C()"
                 #formone="ngForm"
               >
                 <ng-template matStepLabel>Enter Device Id</ng-template>
@@ -244,10 +249,10 @@ import { InventoryService } from 'src/app/services/inventory.service';
                 </div>
               </form>
             </mat-step>
-            <mat-step [stepControl]="secondFormGroup">
+            <mat-step [stepControl]="secondFormGroupC">
               <form
-                [formGroup]="secondFormGroup"
-                (ngSubmit)="form2()"
+                [formGroup]="secondFormGroupC"
+                (ngSubmit)="form2C()"
                 #formtwo="ngForm"
               >
                 <ng-template matStepLabel>Enter Employee Id</ng-template>
@@ -338,14 +343,22 @@ export class EditInventoryComponent implements OnInit, OnDestroy {
   constructor(
     private _formBuilder: FormBuilder,
     private inventoryService: InventoryService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private store1: Store<EmployeeTableState>,
+    private store2: Store<DeviceTableState>
   ) {}
   inventoryItem: string = 'Employee';
   inventoryCategories: string[] = ['Employee', 'Device', 'Link'];
   stepperAnimationValue = '2000';
-  firstFormGroup!: FormGroup;
-  secondFormGroup!: FormGroup;
-  thirdFormGroup!: FormGroup;
+  firstFormGroupA!: FormGroup;
+  secondFormGroupA!: FormGroup;
+  thirdFormGroupA!: FormGroup;
+  firstFormGroupB!: FormGroup;
+  secondFormGroupB!: FormGroup;
+  thirdFormGroupB!: FormGroup;
+  firstFormGroupC!: FormGroup;
+  secondFormGroupC!: FormGroup;
+  thirdFormGroupC!: FormGroup;
   sub: any;
 
   item1!: number;
@@ -353,29 +366,75 @@ export class EditInventoryComponent implements OnInit, OnDestroy {
   item3!: string;
 
   ngOnInit(): void {
-    this.firstFormGroup = this._formBuilder.group({
+    this.firstFormGroupA = this._formBuilder.group({
       firstCtrl: ['', Validators.required],
     });
-    this.secondFormGroup = this._formBuilder.group({
+    this.secondFormGroupA = this._formBuilder.group({
       secondCtrl: ['', Validators.required],
     });
-    this.thirdFormGroup = this._formBuilder.group({
+    this.thirdFormGroupA = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required],
+    });
+    this.firstFormGroupB = this._formBuilder.group({
+      firstCtrl: ['', Validators.required],
+    });
+    this.secondFormGroupB = this._formBuilder.group({
+      secondCtrl: ['', Validators.required],
+    });
+    this.thirdFormGroupB = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required],
+    });
+    this.firstFormGroupC = this._formBuilder.group({
+      firstCtrl: ['', Validators.required],
+    });
+    this.secondFormGroupC = this._formBuilder.group({
+      secondCtrl: ['', Validators.required],
+    });
+    this.thirdFormGroupC = this._formBuilder.group({
       thirdCtrl: ['', Validators.required],
     });
   }
-  form1() {
+  form1A() {
     // console.log(this.firstFormGroup.value);
-    this.item1 = parseInt(this.firstFormGroup.value.firstCtrl);
+    this.item1 = parseInt(this.firstFormGroupA.value.firstCtrl);
   }
 
-  form2() {
+  form2A() {
     // console.log(this.secondFormGroup.value);
-    this.item2 = this.secondFormGroup.value.secondCtrl;
+    this.item2 = this.secondFormGroupA.value.secondCtrl;
   }
 
-  form3() {
+  form3A() {
     // console.log(this.thirdFormGroup.value);
-    this.item3 = this.thirdFormGroup.value.thirdCtrl;
+    this.item3 = this.thirdFormGroupA.value.thirdCtrl;
+  }
+  form1B() {
+    // console.log(this.firstFormGroup.value);
+    this.item1 = parseInt(this.firstFormGroupB.value.firstCtrl);
+  }
+
+  form2B() {
+    // console.log(this.secondFormGroup.value);
+    this.item2 = this.secondFormGroupB.value.secondCtrl;
+  }
+
+  form3B() {
+    // console.log(this.thirdFormGroup.value);
+    this.item3 = this.thirdFormGroupB.value.thirdCtrl;
+  }
+  form1C() {
+    // console.log(this.firstFormGroup.value);
+    this.item1 = parseInt(this.firstFormGroupC.value.firstCtrl);
+  }
+
+  form2C() {
+    // console.log(this.secondFormGroup.value);
+    this.item2 = this.secondFormGroupC.value.secondCtrl;
+  }
+
+  form3C() {
+    // console.log(this.thirdFormGroup.value);
+    this.item3 = this.thirdFormGroupC.value.thirdCtrl;
   }
 
   onSubmit() {
@@ -416,6 +475,8 @@ export class EditInventoryComponent implements OnInit, OnDestroy {
     this._snackBar.open(this.inventoryItem + ' added!', '', {
       duration: 1500,
     });
+    this.store1.dispatch(EmployeeTableActions.toggleLoad());
+    this.store2.dispatch(DeviceTableActions.toggleLoad());
   }
 
   ngOnDestroy() {
